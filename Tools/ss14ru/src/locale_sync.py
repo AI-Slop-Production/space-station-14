@@ -5,7 +5,7 @@
 from pathlib import Path
 from typing import List, Dict, Set, Tuple
 from fluent.syntax import parse
-from fluent.syntax.ast import Message, Resource
+from fluent.syntax.ast import Message, Term, Resource
 import logging
 
 from .config import ProjectConfig
@@ -48,6 +48,8 @@ class LocaleSync:
         """
         Извлекает ключи и атрибуты из Fluent AST
 
+        Обрабатывает как Messages (обычные сообщения), так и Terms (термины с префиксом -)
+
         Args:
             resource: Fluent AST Resource
 
@@ -57,7 +59,8 @@ class LocaleSync:
         keys = {}
 
         for entry in resource.body:
-            if isinstance(entry, Message):
+            # Обрабатываем как Messages, так и Terms
+            if isinstance(entry, (Message, Term)):
                 message_key = entry.id.name
                 attributes = set()
 
@@ -178,22 +181,29 @@ class LocaleSync:
         """
         Объединяет ресурсы, добавляя недостающие ключи и атрибуты
 
+        Обрабатывает как Messages, так и Terms
+
         Returns:
             True если были изменения
         """
         modified = False
-        ru_messages = {entry.id.name: entry for entry in ru_resource.body if isinstance(entry, Message)}
+        # Собираем все русские записи (Messages и Terms) по ключам
+        ru_entries = {
+            entry.id.name: entry
+            for entry in ru_resource.body
+            if isinstance(entry, (Message, Term))
+        }
 
-        # Проходим по всем английским сообщениям
+        # Проходим по всем английским записям (Messages и Terms)
         for entry in en_resource.body:
-            if not isinstance(entry, Message):
+            if not isinstance(entry, (Message, Term)):
                 continue
 
             msg_key = entry.id.name
 
             # Если ключа вообще нет в русском
             if msg_key not in ru_keys:
-                # Добавляем сообщение в конец
+                # Добавляем запись в конец
                 ru_resource.body.append(entry)
                 modified = True
             else:
@@ -201,13 +211,13 @@ class LocaleSync:
                 missing_attrs = en_keys[msg_key] - ru_keys[msg_key]
                 if missing_attrs:
                     # Добавляем недостающие атрибуты
-                    ru_msg = ru_messages[msg_key]
-                    if ru_msg.attributes is None:
-                        ru_msg.attributes = []
+                    ru_entry = ru_entries[msg_key]
+                    if ru_entry.attributes is None:
+                        ru_entry.attributes = []
 
                     for en_attr in entry.attributes or []:
                         if en_attr.id.name in missing_attrs:
-                            ru_msg.attributes.append(en_attr)
+                            ru_entry.attributes.append(en_attr)
                             modified = True
 
         return modified

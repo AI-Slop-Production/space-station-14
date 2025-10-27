@@ -5,7 +5,7 @@
 from pathlib import Path
 from typing import List, Dict
 from fluent.syntax import parse
-from fluent.syntax.ast import Message
+from fluent.syntax.ast import Message, Term
 import logging
 
 from .config import ProjectConfig
@@ -32,7 +32,7 @@ class EmptyCleaner:
             file_path: Путь к файлу
 
         Returns:
-            True если файл пустой (нет сообщений)
+            True если файл пустой (нет сообщений и терминов)
         """
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
@@ -46,11 +46,13 @@ class EmptyCleaner:
             if not content.strip():
                 return True
 
-            # Парсим и проверяем наличие сообщений
+            # Парсим и проверяем наличие сообщений и терминов
             resource = parse(content)
             messages = [entry for entry in resource.body if isinstance(entry, Message)]
+            terms = [entry for entry in resource.body if isinstance(entry, Term)]
 
-            return len(messages) == 0
+            # Файл пустой, только если нет ни сообщений, ни терминов
+            return len(messages) == 0 and len(terms) == 0
 
         except Exception as e:
             self.logger.error(f"Ошибка проверки файла {file_path}: {e}")
