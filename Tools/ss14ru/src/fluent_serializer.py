@@ -25,52 +25,38 @@ class FluentSerializer:
 
         Args:
             entity: Сущность для преобразования
-            add_comments: Добавлять ли комментарии с описанием
+            add_comments: Добавлять ли комментарии с описанием (НЕ ИСПОЛЬЗУЕТСЯ - для совместимости)
             use_parent_references: Использовать ли ссылки на родительские значения
 
         Returns:
-            Список FluentMessage
+            Список FluentMessage (всегда один элемент)
         """
-        messages = []
+        # Собираем атрибуты
+        attributes = {}
 
-        # Генерируем комментарий если нужно
-        comment = None
-        if add_comments:
-            comment = f"Entity: {entity.entity_id}"
-            if entity.parent:
-                comment += f" (Parent: {entity.parent})"
+        if entity.description is not None:
+            attributes['desc'] = entity.description
 
-        # Основное сообщение (name)
+        if entity.suffix is not None:
+            attributes['suffix'] = entity.suffix
+
+        # Определяем значение
         if entity.name is not None:
-            messages.append(FluentMessage(
-                key=entity.get_name_key(),
-                value=entity.name,
-                comment=comment
-            ))
+            value = entity.name
         elif use_parent_references and entity.parent:
             # Если нет name, но есть родитель - создаем ссылку
-            messages.append(FluentMessage(
-                key=entity.get_name_key(),
-                value=f"{{ ent-{entity.parent} }}",
-                comment=comment
-            ))
+            value = f"{{ ent-{entity.parent} }}"
+        else:
+            # Пропускаем сущности без name и без parent
+            return []
 
-        # Атрибут description
-        if entity.description is not None:
-            # Для description комментарий не нужен (он уже есть у основного сообщения)
-            messages.append(FluentMessage(
-                key=entity.get_description_key(),
-                value=entity.description
-            ))
-
-        # Атрибут suffix
-        if entity.suffix is not None:
-            messages.append(FluentMessage(
-                key=entity.get_suffix_key(),
-                value=entity.suffix
-            ))
-
-        return messages
+        # Создаем одно сообщение с атрибутами
+        return [FluentMessage(
+            key=entity.get_name_key(),
+            value=value,
+            comment=None,  # Комментарии не нужны
+            attributes=attributes if attributes else None
+        )]
 
     def entities_to_messages(
         self,
@@ -176,12 +162,6 @@ class FluentSerializer:
         entries = []
 
         for msg in messages:
-            # Добавляем комментарий если есть
-            if msg.comment:
-                comment_lines = msg.comment.split('\n')
-                for line in comment_lines:
-                    entries.append(ast.Comment(content=line))
-
             # Создаем основное сообщение
             message_value = ast.Pattern([
                 ast.TextElement(msg.value)
@@ -206,9 +186,6 @@ class FluentSerializer:
             )
 
             entries.append(message)
-
-            # Добавляем пустую строку после каждого сообщения (для читаемости)
-            entries.append(ast.Junk(" \n"))
 
         return ast.Resource(entries)
 
