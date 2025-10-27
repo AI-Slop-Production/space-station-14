@@ -56,6 +56,7 @@ def generate_from_yaml(config, args):
     logger.info("\nРезультаты генерации:")
     logger.info(f"  Создано файлов: {stats['created']}")
     logger.info(f"  Обновлено файлов: {stats['updated']}")
+    logger.info(f"  Без изменений: {stats['unchanged']}")
     logger.info(f"  Пропущено: {stats['skipped']}")
     logger.info(f"  Ошибок: {stats['errors']}")
 

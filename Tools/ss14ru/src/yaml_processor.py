@@ -133,7 +133,7 @@ class YAMLProcessor:
         self,
         yaml_files: List[Path],
         output_path: Path
-    ) -> bool:
+    ) -> tuple[bool, bool]:
         """
         Генерирует или обновляет Fluent-файл для группы YAML-файлов
 
@@ -145,7 +145,7 @@ class YAMLProcessor:
             output_path: Путь к выходному Fluent-файлу
 
         Returns:
-            True если успешно
+            Кортеж (success, modified): успешность операции и был ли файл реально изменён
         """
         all_entities = []
 
@@ -157,9 +157,9 @@ class YAMLProcessor:
         if not all_entities:
             # Если нет новых сущностей и файл существует - это нормально
             if output_path.exists():
-                return True
+                return (True, False)  # Success but not modified
             self.logger.info(f"Нет локализуемых сущностей для {output_path}")
-            return False
+            return (False, False)
 
         # Генерируем Fluent AST из сущностей
         new_resource = self.serializer.entities_to_ast(
@@ -172,10 +172,13 @@ class YAMLProcessor:
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Объединяем с существующим файлом или используем новый
+        file_modified = False
+
         if self.force_overwrite or not output_path.exists():
             # Режим полной перезаписи или файл не существует
             final_resource = new_resource
             entity_count = len(all_entities)
+            file_modified = True
 
             if output_path.exists():
                 self.logger.warning(f"Перезаписан {output_path} (force_overwrite=True)")
@@ -187,15 +190,16 @@ class YAMLProcessor:
 
             if added_count > 0:
                 self.logger.info(f"Обновлён {output_path} (+{added_count} новых ключей)")
+                file_modified = True
             else:
                 self.logger.debug(f"Без изменений {output_path} (все ключи уже существуют)")
-                return True
+                return (True, False)  # Success but not modified
 
         # Форматируем и сохраняем
         formatted = self.formatter.format_ast(final_resource)
         self.file_handler.write(output_path, formatted)
 
-        return True
+        return (True, file_modified)
 
     def generate_all_locales(self) -> Dict[str, int]:
         """
@@ -209,8 +213,9 @@ class YAMLProcessor:
         """
         stats = {
             'created': 0,     # Созданные файлы
-            'updated': 0,     # Обновлённые файлы (добавлены ключи)
-            'skipped': 0,     # Пропущенные (нет изменений)
+            'updated': 0,     # Файлы с добавленными ключами
+            'unchanged': 0,   # Файлы без изменений
+            'skipped': 0,     # Пропущенные (нет сущностей)
             'errors': 0       # Ошибки
         }
 
@@ -225,16 +230,17 @@ class YAMLProcessor:
                 file_existed = locale_path.exists()
 
                 # Генерируем или обновляем Fluent-файл
-                success = self.generate_fluent_for_group(yaml_files, locale_path)
+                success, modified = self.generate_fluent_for_group(yaml_files, locale_path)
 
                 if success:
                     if not file_existed:
                         stats['created'] += 1
-                    elif self.force_overwrite:
+                    elif modified:
+                        # Файл был реально изменён (добавлены ключи или перезаписан)
                         stats['updated'] += 1
                     else:
-                        # Файл существовал, добавлены ключи или без изменений
-                        stats['updated'] += 1
+                        # Файл обработан но не изменён
+                        stats['unchanged'] += 1
                 else:
                     stats['skipped'] += 1
 
