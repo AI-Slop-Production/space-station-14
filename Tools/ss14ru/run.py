@@ -38,17 +38,24 @@ def install_dependencies():
 
 
 def generate_from_yaml(config, args):
-    """Этап 1: Генерация Fluent из YAML-прототипов"""
+    """Этап 1: Генерация или обновление Fluent из YAML-прототипов"""
     logger = logging.getLogger(__name__)
     logger.info("=" * 60)
     logger.info("ЭТАП 1: Генерация локализации из YAML-прототипов")
     logger.info("=" * 60)
 
-    processor = YAMLProcessor(config)
+    force_overwrite = getattr(args, 'force', False)
+
+    if force_overwrite:
+        logger.warning("⚠️  РЕЖИМ ПОЛНОЙ ПЕРЕЗАПИСИ (--force)")
+        logger.warning("⚠️  Все существующие файлы будут ПЕРЕЗАПИСАНЫ!")
+
+    processor = YAMLProcessor(config, force_overwrite=force_overwrite)
     stats = processor.generate_all_locales()
 
     logger.info("\nРезультаты генерации:")
-    logger.info(f"  Создано файлов в ru-RU: {stats['created_ru']}")
+    logger.info(f"  Создано файлов: {stats['created']}")
+    logger.info(f"  Обновлено файлов: {stats['updated']}")
     logger.info(f"  Пропущено: {stats['skipped']}")
     logger.info(f"  Ошибок: {stats['errors']}")
 
@@ -171,6 +178,12 @@ def main():
         "--dry-run",
         action="store_true",
         help="Режим предпросмотра (не вносить изменения)"
+    )
+
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="⚠️  ОПАСНО: Полная перезапись существующих файлов локализации (удаляет все переводы!)"
     )
 
     parser.add_argument(
