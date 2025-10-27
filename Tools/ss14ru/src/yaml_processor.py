@@ -36,6 +36,8 @@ class YAMLProcessor:
         """
         Обрабатывает один YAML-файл и извлекает локализуемые сущности
 
+        ВАЖНО: Обрабатываются только прототипы с type: entity
+
         Args:
             yaml_path: Путь к YAML-файлу
 
@@ -43,11 +45,8 @@ class YAMLProcessor:
             Список LocalizableEntity
         """
         try:
-            # Загружаем YAML
-            yaml_data = self.yaml_handler.load(yaml_path)
-
-            # Фильтруем сущности
-            yaml_entities = self.yaml_handler.filter_entities(yaml_data)
+            # Извлекаем локализуемые сущности (только type: entity)
+            yaml_entities = self.yaml_handler.extract_localizable_entities(yaml_path)
 
             # Преобразуем в модели
             entities = LocalizableEntity.from_yaml_list(yaml_entities)

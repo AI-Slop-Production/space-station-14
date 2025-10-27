@@ -3,7 +3,7 @@
 """
 
 from typing import List, Dict, Optional, Union
-from fluent.syntax import ast
+from fluent.syntax import ast, parse
 from .models import LocalizableEntity, FluentMessage, TranslationKey
 
 
@@ -13,6 +13,35 @@ class FluentSerializer:
     def __init__(self):
         """Инициализация сериализатора"""
         pass
+
+    def _parse_value_to_pattern(self, value: str) -> ast.Pattern:
+        """
+        Парсит строковое значение в Fluent Pattern AST
+
+        Если значение содержит Fluent placeables (типа { "" } или { Parent }),
+        парсит его как Fluent строку. Иначе создает простой TextElement.
+
+        Args:
+            value: Строковое значение для парсинга
+
+        Returns:
+            Fluent Pattern AST
+        """
+        # Если значение содержит { и }, парсим как Fluent
+        if '{' in value and '}' in value:
+            # Создаем временное Fluent сообщение для парсинга
+            temp_fluent = f"temp = {value}"
+            try:
+                resource = parse(temp_fluent)
+                # Извлекаем pattern из первого сообщения
+                if resource.body and isinstance(resource.body[0], ast.Message):
+                    return resource.body[0].value
+            except:
+                # Если парсинг не удался, используем как текст
+                pass
+
+        # По умолчанию создаем простой TextElement
+        return ast.Pattern([ast.TextElement(value)])
 
     def _format_parent_reference(self, parent: Union[str, List[str]]) -> str:
         """
@@ -66,6 +95,11 @@ class FluentSerializer:
         Returns:
             Список FluentMessage (всегда один элемент)
         """
+        # Проверяем, есть ли вообще хоть что-то для локализации
+        has_any_field = any([entity.name, entity.description, entity.suffix])
+        if not has_any_field:
+            return []
+
         # Определяем значение name
         if entity.name is not None:
             value = entity.name
@@ -73,18 +107,21 @@ class FluentSerializer:
             # Если нет name, но есть родитель - создаем ссылку
             value = self._format_parent_reference(entity.parent)
         else:
-            # Пропускаем сущности без name и без parent
-            return []
+            # Если нет ни name, ни parent - пустая ссылка
+            value = '{ "" }'
 
         # Собираем атрибуты
         attributes = {}
 
-        # Description: если есть свое - используем, иначе ссылка на parent
+        # Description: если есть свое - используем, иначе ссылка на parent или пустая ссылка
         if entity.description is not None:
             attributes['desc'] = entity.description
         elif use_parent_references and entity.parent:
             # Если нет description, но есть parent - ссылка на parent.desc
             attributes['desc'] = self._format_parent_attribute_reference(entity.parent, 'desc')
+        else:
+            # Если нет ни description, ни parent - пустая ссылка
+            attributes['desc'] = '{ "" }'
 
         # Suffix НЕ наследуется от parent
         if entity.suffix is not None:
@@ -202,20 +239,18 @@ class FluentSerializer:
         entries = []
 
         for msg in messages:
-            # Создаем основное сообщение
-            message_value = ast.Pattern([
-                ast.TextElement(msg.value)
-            ])
+            # Парсим значение в Pattern (поддерживает placeables)
+            message_value = self._parse_value_to_pattern(msg.value)
 
             # Создаем атрибуты если есть
             attributes = []
             if msg.attributes:
                 for attr_name, attr_value in msg.attributes.items():
+                    # Парсим каждый атрибут тоже
+                    attr_pattern = self._parse_value_to_pattern(attr_value)
                     attributes.append(ast.Attribute(
                         id=ast.Identifier(attr_name),
-                        value=ast.Pattern([
-                            ast.TextElement(attr_value)
-                        ])
+                        value=attr_pattern
                     ))
 
             # Создаем Message

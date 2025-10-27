@@ -98,6 +98,9 @@ class YAMLHandler:
         """
         Извлекает сущности, подходящие для локализации
 
+        ВАЖНО: Обрабатываются только прототипы с type: entity
+        Все остальные типы (trait, recipe, и т.д.) пропускаются
+
         Args:
             file_path: Путь к YAML-файлу
             extract_name: Извлекать ли поле name
@@ -113,6 +116,11 @@ class YAMLHandler:
         localizable = []
 
         for entity in entities:
+            # ВАЖНО: Обрабатываем только type: entity
+            entity_type = entity.get('type')
+            if entity_type != 'entity':
+                continue
+
             # Проверяем, есть ли хотя бы одно локализуемое поле
             has_localizable = False
 
@@ -149,7 +157,7 @@ class YAMLHandler:
 
     def extract_parent(self, entity: Dict[str, Any]):
         """
-        Извлекает родительский прототип (parent или type)
+        Извлекает родительский прототип из поля 'parent'
 
         Args:
             entity: Словарь сущности
@@ -157,16 +165,12 @@ class YAMLHandler:
         Returns:
             ID родительского прототипа (str), список ID (List[str]) или None
         """
-        # Сначала проверяем поле 'parent'
+        # Проверяем поле 'parent'
         if "parent" in entity:
             parent = entity["parent"]
             # parent может быть строкой или списком - возвращаем как есть
             if isinstance(parent, (str, list)):
                 return parent
-
-        # Затем проверяем поле 'type'
-        if "type" in entity:
-            return entity["type"]
 
         return None
 

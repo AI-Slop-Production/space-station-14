@@ -47,8 +47,6 @@ class LocalizableEntity:
             parent_val = data["parent"]
             if isinstance(parent_val, (str, list)):
                 parent = parent_val
-        elif "type" in data:
-            parent = data["type"]
 
         # Преобразуем значения в строки, если они существуют
         name_val = data.get('name')
