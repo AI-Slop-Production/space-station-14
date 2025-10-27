@@ -52,11 +52,16 @@ class LocalizableEntity:
         elif "type" in data:
             parent = data["type"]
 
+        # Преобразуем значения в строки, если они существуют
+        name_val = data.get('name')
+        description_val = data.get('description')
+        suffix_val = data.get('suffix')
+
         return cls(
-            entity_id=data['id'],
-            name=data.get('name'),
-            description=data.get('description'),
-            suffix=data.get('suffix'),
+            entity_id=str(data['id']),
+            name=str(name_val) if name_val is not None else None,
+            description=str(description_val) if description_val is not None else None,
+            suffix=str(suffix_val) if suffix_val is not None else None,
             parent=parent
         )
 

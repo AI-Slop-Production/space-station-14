@@ -12,7 +12,28 @@ class YAMLHandler:
 
     def __init__(self):
         """Инициализация обработчика YAML"""
-        pass
+        # Добавляем безопасный конструктор для всех неизвестных тегов SS14
+        # Это позволяет игнорировать теги типа !type:ActionAnomalyPulseEvent
+        yaml.add_multi_constructor('!type:', self._unknown_constructor, Loader=yaml.SafeLoader)
+
+    def _unknown_constructor(self, loader, tag_suffix, node):
+        """
+        Конструктор для обработки неизвестных тегов SS14
+
+        Args:
+            loader: YAML загрузчик
+            tag_suffix: Суффикс тега (например, ActionAnomalyPulseEvent)
+            node: Узел YAML
+
+        Returns:
+            Словарь с данными узла
+        """
+        if isinstance(node, yaml.MappingNode):
+            return loader.construct_mapping(node)
+        elif isinstance(node, yaml.SequenceNode):
+            return loader.construct_sequence(node)
+        else:
+            return loader.construct_scalar(node)
 
     def load(self, file_path: Path) -> List[Dict[str, Any]]:
         """

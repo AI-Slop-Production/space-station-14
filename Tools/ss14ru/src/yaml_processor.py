@@ -121,13 +121,12 @@ class YAMLProcessor:
 
     def generate_all_locales(self) -> Dict[str, int]:
         """
-        Генерирует все Fluent-файлы из YAML-прототипов
+        Генерирует все Fluent-файлы из YAML-прототипов напрямую в ru-RU
 
         Returns:
             Статистика {status: count}
         """
         stats = {
-            'created_en': 0,
             'created_ru': 0,
             'skipped': 0,
             'errors': 0
@@ -140,25 +139,12 @@ class YAMLProcessor:
 
         for locale_path, yaml_files in grouped.items():
             try:
-                # Генерируем английскую версию
-                en_path = locale_path
-                success = self.generate_fluent_for_group(yaml_files, en_path)
+                # locale_path уже указывает на ru-RU/ss14-ru/...
+                # Генерируем Fluent-файл напрямую в ru-RU
+                success = self.generate_fluent_for_group(yaml_files, locale_path)
 
                 if success:
-                    stats['created_en'] += 1
-
-                    # Проверяем, нужно ли создать русскую версию
-                    ru_path = self.config.get_mirrored_locale_path(
-                        en_path,
-                        create_dirs=True
-                    )
-
-                    if not ru_path.exists():
-                        # Копируем английскую версию как базу для русской
-                        en_content = self.file_handler.read(en_path)
-                        self.file_handler.write(ru_path, en_content)
-                        stats['created_ru'] += 1
-                        self.logger.info(f"Создана русская копия: {ru_path}")
+                    stats['created_ru'] += 1
                 else:
                     stats['skipped'] += 1
 

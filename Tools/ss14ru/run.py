@@ -48,8 +48,7 @@ def generate_from_yaml(config, args):
     stats = processor.generate_all_locales()
 
     logger.info("\nРезультаты генерации:")
-    logger.info(f"  Создано английских файлов: {stats['created_en']}")
-    logger.info(f"  Создано русских копий: {stats['created_ru']}")
+    logger.info(f"  Создано файлов в ru-RU: {stats['created_ru']}")
     logger.info(f"  Пропущено: {stats['skipped']}")
     logger.info(f"  Ошибок: {stats['errors']}")
 
