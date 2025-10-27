@@ -97,9 +97,9 @@ class LocalizableEntity:
             True если есть хотя бы одно локализуемое поле
         """
         return any([
-            self.name is not None,
-            self.description is not None,
-            self.suffix is not None
+            self.name is not None and self.name != '',
+            self.description is not None and self.description != '',
+            self.suffix is not None and self.suffix != ''
         ])
 
     def get_fluent_key_prefix(self) -> str:

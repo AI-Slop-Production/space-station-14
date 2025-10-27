@@ -47,36 +47,42 @@ class FluentSerializer:
         """
         Форматирует ссылку на родительское сообщение
 
+        ВАЖНО: Fluent не поддерживает списки в ссылках { [A, B] }.
+        Для списка родителей используем последнего (наиболее специфичный).
+
         Args:
             parent: ID родителя (строка или список строк)
 
         Returns:
-            Форматированная ссылка (например, "{ ParentId }" или "{ [Parent1, Parent2] }")
+            Форматированная ссылка (например, "{ ParentId }")
         """
         if isinstance(parent, str):
             return f"{{ {parent} }}"
-        elif isinstance(parent, list):
-            parent_refs = ", ".join(parent)
-            return f"{{ [{parent_refs}] }}"
-        return ""
+        elif isinstance(parent, list) and parent:
+            # Берём последнего родителя из списка (наиболее специфичный)
+            return f"{{ {parent[-1]} }}"
+        return "{ \"\" }"
 
     def _format_parent_attribute_reference(self, parent: Union[str, List[str]], attribute: str) -> str:
         """
         Форматирует ссылку на атрибут родительского сообщения
+
+        ВАЖНО: Fluent не поддерживает списки в ссылках { [A.desc, B.desc] }.
+        Для списка родителей используем последнего (наиболее специфичный).
 
         Args:
             parent: ID родителя (строка или список строк)
             attribute: Имя атрибута (например, "desc")
 
         Returns:
-            Форматированная ссылка (например, "{ ParentId.desc }" или "{ [Parent1.desc, Parent2.desc] }")
+            Форматированная ссылка (например, "{ ParentId.desc }")
         """
         if isinstance(parent, str):
             return f"{{ {parent}.{attribute} }}"
-        elif isinstance(parent, list):
-            parent_refs = ", ".join([f"{p}.{attribute}" for p in parent])
-            return f"{{ [{parent_refs}] }}"
-        return ""
+        elif isinstance(parent, list) and parent:
+            # Берём последнего родителя из списка (наиболее специфичный)
+            return f"{{ {parent[-1]}.{attribute} }}"
+        return "{ \"\" }"
 
     def entity_to_messages(
         self,
@@ -124,7 +130,8 @@ class FluentSerializer:
             attributes['desc'] = '{ "" }'
 
         # Suffix НЕ наследуется от parent
-        if entity.suffix is not None:
+        # Проверяем, что suffix не None и не пустая строка
+        if entity.suffix is not None and entity.suffix != '':
             attributes['suffix'] = entity.suffix
 
         # Создаем одно сообщение с атрибутами
