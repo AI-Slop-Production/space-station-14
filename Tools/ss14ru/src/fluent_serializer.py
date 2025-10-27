@@ -2,7 +2,7 @@
 Компонент сериализации Fluent-сообщений
 """
 
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 from fluent.syntax import ast
 from .models import LocalizableEntity, FluentMessage, TranslationKey
 
@@ -13,6 +13,41 @@ class FluentSerializer:
     def __init__(self):
         """Инициализация сериализатора"""
         pass
+
+    def _format_parent_reference(self, parent: Union[str, List[str]]) -> str:
+        """
+        Форматирует ссылку на родительское сообщение
+
+        Args:
+            parent: ID родителя (строка или список строк)
+
+        Returns:
+            Форматированная ссылка (например, "{ ParentId }" или "{ [Parent1, Parent2] }")
+        """
+        if isinstance(parent, str):
+            return f"{{ {parent} }}"
+        elif isinstance(parent, list):
+            parent_refs = ", ".join(parent)
+            return f"{{ [{parent_refs}] }}"
+        return ""
+
+    def _format_parent_attribute_reference(self, parent: Union[str, List[str]], attribute: str) -> str:
+        """
+        Форматирует ссылку на атрибут родительского сообщения
+
+        Args:
+            parent: ID родителя (строка или список строк)
+            attribute: Имя атрибута (например, "desc")
+
+        Returns:
+            Форматированная ссылка (например, "{ ParentId.desc }" или "{ [Parent1.desc, Parent2.desc] }")
+        """
+        if isinstance(parent, str):
+            return f"{{ {parent}.{attribute} }}"
+        elif isinstance(parent, list):
+            parent_refs = ", ".join([f"{p}.{attribute}" for p in parent])
+            return f"{{ [{parent_refs}] }}"
+        return ""
 
     def entity_to_messages(
         self,
@@ -31,24 +66,29 @@ class FluentSerializer:
         Returns:
             Список FluentMessage (всегда один элемент)
         """
-        # Собираем атрибуты
-        attributes = {}
-
-        if entity.description is not None:
-            attributes['desc'] = entity.description
-
-        if entity.suffix is not None:
-            attributes['suffix'] = entity.suffix
-
-        # Определяем значение
+        # Определяем значение name
         if entity.name is not None:
             value = entity.name
         elif use_parent_references and entity.parent:
             # Если нет name, но есть родитель - создаем ссылку
-            value = f"{{ ent-{entity.parent} }}"
+            value = self._format_parent_reference(entity.parent)
         else:
             # Пропускаем сущности без name и без parent
             return []
+
+        # Собираем атрибуты
+        attributes = {}
+
+        # Description: если есть свое - используем, иначе ссылка на parent
+        if entity.description is not None:
+            attributes['desc'] = entity.description
+        elif use_parent_references and entity.parent:
+            # Если нет description, но есть parent - ссылка на parent.desc
+            attributes['desc'] = self._format_parent_attribute_reference(entity.parent, 'desc')
+
+        # Suffix НЕ наследуется от parent
+        if entity.suffix is not None:
+            attributes['suffix'] = entity.suffix
 
         # Создаем одно сообщение с атрибутами
         return [FluentMessage(

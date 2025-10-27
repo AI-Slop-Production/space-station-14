@@ -104,7 +104,7 @@ class YAMLProcessor:
         fluent_content = self.serializer.entities_to_ast(
             all_entities,
             add_comments=True,
-            use_parent_references=False
+            use_parent_references=True
         )
 
         # Форматируем

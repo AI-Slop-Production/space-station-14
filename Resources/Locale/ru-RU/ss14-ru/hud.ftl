@@ -1,0 +1,14 @@
+ent-SS14DefaultTheme = ui-options-hud-theme-default
+    .desc = { hudTheme.desc }
+ent-SS14PlasmafireTheme = ui-options-hud-theme-plasmafire
+    .desc = { hudTheme.desc }
+ent-SS14SlimecoreTheme = ui-options-hud-theme-slimecore
+    .desc = { hudTheme.desc }
+ent-SS14ClockworkTheme = ui-options-hud-theme-clockwork
+    .desc = { hudTheme.desc }
+ent-SS14RetroTheme = ui-options-hud-theme-retro
+    .desc = { hudTheme.desc }
+ent-SS14MinimalistTheme = ui-options-hud-theme-minimalist
+    .desc = { hudTheme.desc }
+ent-SS14AshenTheme = ui-options-hud-theme-ashen
+    .desc = { hudTheme.desc }

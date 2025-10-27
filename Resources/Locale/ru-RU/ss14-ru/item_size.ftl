@@ -1,0 +1,12 @@
+ent-Tiny = item-component-size-Tiny
+    .desc = { itemSize.desc }
+ent-Small = item-component-size-Small
+    .desc = { itemSize.desc }
+ent-Normal = item-component-size-Normal
+    .desc = { itemSize.desc }
+ent-Large = item-component-size-Large
+    .desc = { itemSize.desc }
+ent-Huge = item-component-size-Huge
+    .desc = { itemSize.desc }
+ent-Ginormous = item-component-size-Ginormous
+    .desc = { itemSize.desc }

@@ -1,0 +1,16 @@
+ent-OrganAnimalLungs = animal lungs
+    .desc = { BaseAnimalOrgan.desc }
+ent-OrganAnimalStomach = animal stomach
+    .desc = { BaseAnimalOrgan.desc }
+ent-OrganAnimalLiver = animal liver
+    .desc = { BaseAnimalOrgan.desc }
+ent-OrganAnimalHeart = animal heart
+    .desc = { BaseAnimalOrgan.desc }
+ent-OrganAnimalKidneys = animal kidneys
+    .desc = { BaseAnimalOrgan.desc }
+ent-OrganAnimalRuminantStomach = ruminant stomach
+    .desc = { OrganAnimalStomach.desc }
+ent-SentientSlimesCore = sentient slimes core
+    .desc = The source of incredible, unending gooeyness.
+ent-OrganSlimesLungs = slimes gas sacs
+    .desc = Collects nitrogen, which slime cells use for maintenance.

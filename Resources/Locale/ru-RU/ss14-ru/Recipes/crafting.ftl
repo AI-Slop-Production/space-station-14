@@ -1,0 +1,16 @@
+ent-CrateFreezer = construction-recipe-crate-freezer
+    .desc = { construction.desc }
+ent-BigBox = construction-recipe-big-box
+    .desc = { construction.desc }
+ent-BoxCardboard = construction-recipe-box-cardboard
+    .desc = { construction.desc }
+ent-ToteBase = construction-recipe-box-tote
+    .desc = { construction.desc }
+ent-smokeableJointRainbow = construction-smokeable-joint-rainbow
+    .desc = { construction.desc }
+ent-smokeableBluntRainbow = construction-smokeable-blunt-rainbow
+    .desc = { construction.desc }
+ent-ClosetFreezer = construction-recipe-closet-freezer
+    .desc = { construction.desc }
+ent-SilkWovenCloth = construction-recipe-silk-woven-cloth
+    .desc = { construction.desc }

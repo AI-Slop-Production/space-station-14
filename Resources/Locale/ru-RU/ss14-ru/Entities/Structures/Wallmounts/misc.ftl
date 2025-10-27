@@ -1,0 +1,9 @@
+ent-BoxingBell = boxing bell
+    .desc = Ding ding!
+ent-Mirror = mirror
+    .desc = Mirror mirror on the wall , who's the most robust of them all?
+ent-MirrorModern = { Mirror }
+    .desc = { Mirror.desc }
+    .suffix = rectangle
+ent-NoticeBoard = notice board
+    .desc = Is there a job for a witcher?

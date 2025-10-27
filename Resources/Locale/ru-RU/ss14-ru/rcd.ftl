@@ -1,0 +1,10 @@
+ent-Deconstruct = rcd-component-deconstruct
+    .desc = { rcd.desc }
+ent-DeconstructLattice = rcd-component-deconstruct
+    .desc = { rcd.desc }
+ent-DeconstructTile = rcd-component-deconstruct
+    .desc = { rcd.desc }
+ent-Plating = rcd-component-plating
+    .desc = { rcd.desc }
+ent-FloorSteel = rcd-component-floor-steel
+    .desc = { rcd.desc }

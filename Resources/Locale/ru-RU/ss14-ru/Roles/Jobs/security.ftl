@@ -1,0 +1,10 @@
+ent-Detective = job-name-detective
+    .desc = job-description-detective
+ent-HeadOfSecurity = job-name-hos
+    .desc = job-description-hos
+ent-SecurityCadet = job-name-cadet
+    .desc = job-description-cadet
+ent-SecurityOfficer = job-name-security
+    .desc = job-description-security
+ent-Warden = job-name-warden
+    .desc = job-description-warden

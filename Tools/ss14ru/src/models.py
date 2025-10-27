@@ -3,7 +3,7 @@
 """
 
 from dataclasses import dataclass
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 
 
 @dataclass
@@ -22,7 +22,7 @@ class LocalizableEntity:
     name: Optional[str] = None
     description: Optional[str] = None
     suffix: Optional[str] = None
-    parent: Optional[str] = None
+    parent: Optional[Union[str, List[str]]] = None
 
     @classmethod
     def from_yaml_dict(cls, data: Dict[str, Any]) -> 'LocalizableEntity':
@@ -41,14 +41,12 @@ class LocalizableEntity:
         if 'id' not in data:
             raise ValueError("YAML-сущность должна содержать поле 'id'")
 
-        # Извлекаем родителя
+        # Извлекаем родителя (сохраняем как есть: строку или список)
         parent = None
         if "parent" in data:
             parent_val = data["parent"]
-            if isinstance(parent_val, str):
+            if isinstance(parent_val, (str, list)):
                 parent = parent_val
-            elif isinstance(parent_val, list) and parent_val:
-                parent = parent_val[-1]
         elif "type" in data:
             parent = data["type"]
 

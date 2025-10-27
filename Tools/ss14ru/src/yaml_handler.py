@@ -147,7 +147,7 @@ class YAMLHandler:
         """
         return entity.get(field, default)
 
-    def extract_parent(self, entity: Dict[str, Any]) -> Optional[str]:
+    def extract_parent(self, entity: Dict[str, Any]):
         """
         Извлекает родительский прототип (parent или type)
 
@@ -155,17 +155,14 @@ class YAMLHandler:
             entity: Словарь сущности
 
         Returns:
-            ID родительского прототипа или None
+            ID родительского прототипа (str), список ID (List[str]) или None
         """
         # Сначала проверяем поле 'parent'
         if "parent" in entity:
             parent = entity["parent"]
-            # parent может быть строкой или списком
-            if isinstance(parent, str):
+            # parent может быть строкой или списком - возвращаем как есть
+            if isinstance(parent, (str, list)):
                 return parent
-            elif isinstance(parent, list) and parent:
-                # Берем последнего родителя из списка
-                return parent[-1]
 
         # Затем проверяем поле 'type'
         if "type" in entity:

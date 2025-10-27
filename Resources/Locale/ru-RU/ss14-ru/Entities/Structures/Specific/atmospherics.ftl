@@ -1,0 +1,16 @@
+ent-AirSensorFreezerBase = { AirSensorBase }
+    .desc = { AirSensorBase.desc }
+    .suffix = Freezer Atmosphere
+ent-AirAlarmFreezer = { AirAlarm }
+    .desc = { AirAlarm.desc }
+    .suffix = Freezer Atmosphere, auto mode disabled
+ent-AirSensor = air sensor
+    .desc = Air sensor. It senses air.
+ent-AirSensorAssembly = air sensor assembly
+    .desc = Air sensor assembly. An assembly of air sensors?
+ent-AirSensorVoxBase = { AirSensorBase }
+    .desc = { AirSensorBase.desc }
+    .suffix = Vox Atmosphere
+ent-AirAlarmVox = { AirAlarm }
+    .desc = { AirAlarm.desc }
+    .suffix = Vox Atmosphere, auto mode disabled

@@ -1,0 +1,11 @@
+ent-FloorDrain = drain
+    .desc = Drains puddles around it. Useful for dumping mop buckets or keeping certain rooms clean.
+ent-MopBucket = mop bucket
+    .desc = Holds water and the tears of the janitor.
+ent-MopBucketFull = mop bucket
+    .desc = { MopBucket.desc }
+    .suffix = full
+ent-MopBucketCubeWrapped = mop bucket cube
+    .desc = Unwrap this to get a mop bucket cube.
+ent-JanitorialTrolley = janitorial trolley
+    .desc = This is the alpha and omega of sanitation.

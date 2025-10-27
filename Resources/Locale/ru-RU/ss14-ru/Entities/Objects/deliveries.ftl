@@ -1,0 +1,12 @@
+ent-PackageDelivery = package
+    .desc = { BaseDelivery.desc }
+ent-LetterDelivery = letter
+    .desc = { BaseDelivery.desc }
+ent-DeliveryModifierPriority = { entity }
+    .desc = Components to add when a delivery is rolled as priority.
+ent-DeliveryModifierFragile = { entity }
+    .desc = Components to add when a delivery is rolled as fragile.
+ent-DeliveryModifierBomb = { entity }
+    .desc = Components to add when a delivery is rolled as a bomb.
+ent-MailSpamLetter = spam letter
+    .desc = Even space isn't safe from junk mail.

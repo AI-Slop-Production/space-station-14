@@ -1,0 +1,10 @@
+ent-Chemist = job-name-chemist
+    .desc = job-description-chemist
+ent-ChiefMedicalOfficer = job-name-cmo
+    .desc = job-description-cmo
+ent-MedicalDoctor = job-name-doctor
+    .desc = job-description-doctor
+ent-MedicalIntern = job-name-intern
+    .desc = job-description-intern
+ent-Paramedic = job-name-paramedic
+    .desc = job-description-paramedic

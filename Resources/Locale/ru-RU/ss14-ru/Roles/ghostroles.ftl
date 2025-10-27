@@ -1,0 +1,14 @@
+ent-SyndicateKobold = ghost-role-information-syndicate-kobold-reinforcement-name
+    .desc = ghost-role-information-syndicate-kobold-reinforcement-description
+ent-SyndicateKoboldNukeops = ghost-role-information-syndicate-kobold-reinforcement-name
+    .desc = ghost-role-information-syndicate-kobold-reinforcement-description
+ent-SyndicateMonkey = ghost-role-information-syndicate-monkey-reinforcement-name
+    .desc = ghost-role-information-syndicate-monkey-reinforcement-description
+ent-SyndicateMonkeyNukeops = ghost-role-information-syndicate-monkey-reinforcement-name
+    .desc = ghost-role-information-syndicate-monkey-reinforcement-description
+ent-SyndicateAgentMedic = ghost-role-information-syndicate-reinforcement-medic-name
+    .desc = ghost-role-information-syndicate-reinforcement-medic-description
+ent-SyndicateAgentSpy = ghost-role-information-syndicate-reinforcement-spy-name
+    .desc = ghost-role-information-syndicate-reinforcement-spy-description
+ent-SyndicateAgentThief = ghost-role-information-syndicate-reinforcement-thief-name
+    .desc = ghost-role-information-syndicate-reinforcement-thief-description
