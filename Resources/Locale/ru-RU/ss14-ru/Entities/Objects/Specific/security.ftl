@@ -1,0 +1,14 @@
+ent-DeployableBarrier = deployable barrier
+    .desc = A deployable barrier. Swipe your ID card to lock/unlock it.
+ent-EvidenceMarker = evidence marker
+    .desc = A numbered yellow marker, useful for labeling evidence on a crime scene.
+ent-BoxEvidenceMarkers = evidence marker box
+    .desc = A pack of numbered yellow markers, useful for labeling evidence on a crime scene.
+ent-TargetHuman = human target
+    .desc = A shooting target. This one is a human.
+ent-TargetSyndicate = syndicate target
+    .desc = A shooting target. This one is a syndicate agent.
+ent-TargetClown = clown target
+    .desc = A shooting target. This one is a clown.
+ent-TargetStrange = strange target
+    .desc = A shooting target. You aren't quite sure what this one is, but it seems to be extra robust.

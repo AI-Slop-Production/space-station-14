@@ -1,0 +1,16 @@
+ent-BiomassReclaimer = biomass reclaimer
+    .desc = Reclaims biomass from corpses. Gruesome.
+ent-MachineElectrolysisUnit = electrolysis unit
+    .desc = The latest in medicinal electrocution technology.
+ent-MachineCentrifuge = tabletop centrifuge
+    .desc = Around and around it goes...
+ent-CryoPod = cryo pod
+    .desc = A special machine intended to create a safe environment for the use of chemicals that react in cold environments.
+ent-CryoPodDestroyed = destroyed cryo pod
+    .desc = A cryo pod that has seen better days. It's entirely inoperable; not good for anything but scrap.
+ent-DiseaseDiagnoser = Disease Diagnoser Delta Extreme
+    .desc = A machine that analyzes disease samples.
+ent-DiagnosisReportPaper = disease diagnoser report
+    .desc = A chilling medical receipt.
+ent-Vaccinator = vaccinator
+    .desc = A machine that creates vaccines.

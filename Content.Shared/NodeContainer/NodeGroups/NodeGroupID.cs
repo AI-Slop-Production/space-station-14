@@ -10,6 +10,9 @@ public enum NodeGroupID : byte
     Pipe,
     WireNet,
 
+    // Water transport network
+    Water,
+
     /// <summary>
     /// Group used by the TEG.
     /// </summary>

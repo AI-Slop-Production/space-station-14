@@ -1,0 +1,14 @@
+ent-SpawnPointNukies = nukies
+    .desc = { MarkerBase.desc }
+ent-SpawnPointPirates = Pirate spawn point
+    .desc = { MarkerBase.desc }
+ent-AITimedSpawner = AI Timed Spawner
+    .desc = { MarkerBase.desc }
+ent-XenoAITimedSpawner = Xeno AI Timed Spawner
+    .desc = { MarkerBase.desc }
+ent-MouseTimedSpawner = Mouse Timed Spawner
+    .desc = { MarkerBase.desc }
+ent-CockroachTimedSpawner = Cockroach Timed Spawner
+    .desc = { MouseTimedSpawner.desc }
+ent-SpawnPointWizard = wizard
+    .desc = { MarkerBase.desc }

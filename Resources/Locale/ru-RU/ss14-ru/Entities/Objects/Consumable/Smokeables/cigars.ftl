@@ -1,0 +1,14 @@
+ent-CigarCase = cigar case
+    .desc = A case for holding your cigars when you are not smoking them.
+ent-CigarGoldCase = premium cigar case
+    .desc = A case of premium Havanian cigars. You'll only see heads with these.
+ent-Cigar = cigar
+    .desc = A brown roll of tobacco and... well, you're not quite sure.
+ent-CigarSpent = { Cigar }
+    .desc = { Cigar.desc }
+    .suffix = spent
+ent-CigarGold = premium Havanian cigar
+    .desc = A cigar fit for only the best of the best.
+ent-CigarGoldSpent = { CigarGold }
+    .desc = { CigarGold.desc }
+    .suffix = spent

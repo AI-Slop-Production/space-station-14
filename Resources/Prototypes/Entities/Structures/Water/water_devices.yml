@@ -1,0 +1,39 @@
+- type: entity
+  id: WaterReservoirBasic
+  name: water reservoir
+  description: Stores water for the water network.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: NodeContainer
+    nodes:
+      port:
+        !type:WaterDeviceNode
+        nodeGroupID: Water
+  - type: WaterReservoir
+    capacity: 2000
+    currentVolume: 2000
+    maxOutputPerSecond: 50
+    node: port
+
+- type: entity
+  id: WaterConsumerTest
+  name: water consumer (test)
+  description: A simple device consuming water from the network.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: NodeContainer
+    nodes:
+      port:
+        !type:WaterDeviceNode
+        nodeGroupID: Water
+  - type: WaterConsumer
+    desiredFlowPerSecond: 10
+    node: port
+
+

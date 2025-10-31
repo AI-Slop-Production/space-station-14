@@ -1,0 +1,27 @@
+- type: entity
+  abstract: true
+  id: WaterPipeBase
+  name: water pipe
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+    noRot: true
+  - type: Physics
+    bodyType: Static
+    canCollide: false
+  - type: Fixtures
+  - type: NodeContainer
+    nodes:
+      pipe:
+        !type:WaterPipeNode
+        nodeGroupID: Water
+        pipeDirection: Fourway
+
+- type: entity
+  parent: WaterPipeBase
+  id: WaterPipeStraight
+  suffix: Straight
+
+
