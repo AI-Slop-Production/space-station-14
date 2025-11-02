@@ -102,9 +102,9 @@ def cleanup_duplicates(config, args):
     )
 
     logger.info("\nРезультаты очистки дубликатов:")
+    logger.info(f"  Найдено дублирующихся ключей: {stats['duplicate_keys_found']}")
+    logger.info(f"  Удалено дубликатов: {stats['duplicates_removed']}")
     logger.info(f"  Обработано файлов: {stats['files_processed']}")
-    logger.info(f"  Файлов с дубликатами: {stats['files_with_duplicates']}")
-    logger.info(f"  Удалено дубликатов: {stats['total_duplicates_removed']}")
     logger.info(f"  Ошибок: {stats['errors']}")
 
     return stats['errors'] == 0
