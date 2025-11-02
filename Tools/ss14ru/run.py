@@ -146,6 +146,8 @@ def cleanup_orphans(config, args):
     logger.info(f"  Обработано файлов: {stats['files_processed']}")
     logger.info(f"  Очищено файлов: {stats['files_cleaned']}")
     logger.info(f"  Удалено orphan-ключей: {stats['orphans_removed']}")
+    if stats.get('yaml_parse_errors', 0) > 0:
+        logger.info(f"  Пропущено YAML файлов с ошибками: {stats['yaml_parse_errors']}")
     logger.info(f"  Ошибок: {stats['errors']}")
 
     return stats['errors'] == 0

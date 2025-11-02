@@ -30,14 +30,15 @@ class OrphanCleaner:
         self.yaml_handler = YAMLHandler()
         self.logger = logging.getLogger(__name__)
 
-    def get_all_entity_ids_from_yaml(self) -> Set[str]:
+    def get_all_entity_ids_from_yaml(self) -> tuple[Set[str], int]:
         """
         Собирает все entity ID из YAML прототипов
 
         Returns:
-            Множество всех entity ID
+            Кортеж (множество entity ID, количество ошибок парсинга)
         """
         entity_ids = set()
+        parse_errors = 0
 
         yaml_files = self.config.get_prototype_files()
 
@@ -48,10 +49,22 @@ class OrphanCleaner:
                     if 'id' in entity:
                         entity_ids.add(entity['id'])
             except Exception as e:
-                self.logger.debug(f"Ошибка чтения {yaml_file}: {e}")
+                parse_errors += 1
+                # Относительный путь для более читаемого сообщения
+                rel_path = yaml_file.relative_to(self.config.prototypes_dir)
+
+                # Определяем тип ошибки
+                error_msg = str(e)
+                if 'found character' in error_msg and 'cannot start any token' in error_msg:
+                    self.logger.warning(
+                        f"Пропуск {rel_path}: Найдена табуляция вместо пробелов "
+                        f"(YAML не поддерживает табуляцию)"
+                    )
+                else:
+                    self.logger.warning(f"Пропуск {rel_path}: {error_msg}")
                 continue
 
-        return entity_ids
+        return entity_ids, parse_errors
 
     def get_keys_from_en_us_file(self, en_us_path: Path) -> Set[str]:
         """
@@ -212,13 +225,18 @@ class OrphanCleaner:
             'files_processed': 0,
             'files_cleaned': 0,
             'orphans_removed': 0,
+            'yaml_parse_errors': 0,
             'errors': 0
         }
 
         # Собираем все entity ID из YAML
         self.logger.info("Сканирование YAML прототипов...")
-        valid_entity_ids = self.get_all_entity_ids_from_yaml()
+        valid_entity_ids, yaml_errors = self.get_all_entity_ids_from_yaml()
+        stats['yaml_parse_errors'] = yaml_errors
+
         self.logger.info(f"Найдено {len(valid_entity_ids)} entity в YAML прототипах")
+        if yaml_errors > 0:
+            self.logger.warning(f"Пропущено {yaml_errors} YAML файлов с ошибками парсинга")
 
         # Формируем валидные ключи (с префиксом ent-)
         valid_keys = set()
@@ -331,6 +349,7 @@ class OrphanCleaner:
             'files_processed': ss14_stats['files_processed'] + regular_stats['files_processed'],
             'files_cleaned': ss14_stats['files_cleaned'] + regular_stats['files_cleaned'],
             'orphans_removed': ss14_stats['orphans_removed'] + regular_stats['orphans_removed'],
+            'yaml_parse_errors': ss14_stats.get('yaml_parse_errors', 0),
             'errors': ss14_stats['errors'] + regular_stats['errors']
         }
 
