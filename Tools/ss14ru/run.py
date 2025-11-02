@@ -16,6 +16,7 @@ from src.yaml_processor import YAMLProcessor, setup_logging
 from src.locale_sync import LocaleSync
 from src.cleanup_duplicates import DuplicateCleaner
 from src.cleanup_empty import EmptyCleaner
+from src.cleanup_orphans import OrphanCleaner
 from src.normalize_dashes import DashNormalizer
 
 
@@ -131,8 +132,27 @@ def cleanup_empty(config, args):
     return stats['errors'] == 0
 
 
+def cleanup_orphans(config, args):
+    """Этап 5: Очистка orphan-ключей"""
+    logger = logging.getLogger(__name__)
+    logger.info("\n" + "=" * 60)
+    logger.info("ЭТАП 5: Очистка orphan-ключей")
+    logger.info("=" * 60)
+
+    cleaner = OrphanCleaner(config)
+    stats = cleaner.clean_all(dry_run=args.dry_run)
+
+    logger.info("\nРезультаты очистки orphan-ключей:")
+    logger.info(f"  Обработано файлов: {stats['files_processed']}")
+    logger.info(f"  Очищено файлов: {stats['files_cleaned']}")
+    logger.info(f"  Удалено orphan-ключей: {stats['orphans_removed']}")
+    logger.info(f"  Ошибок: {stats['errors']}")
+
+    return stats['errors'] == 0
+
+
 def normalize_dashes(config, args):
-    """Этап 5: Нормализация тире (опционально)"""
+    """Этап 6: Нормализация тире (опционально)"""
     if args.skip_normalize:
         return True
 
@@ -170,7 +190,7 @@ def main():
 
     parser.add_argument(
         "--step",
-        choices=["generate", "sync", "cleanup-dupes", "cleanup-empty", "normalize", "all"],
+        choices=["generate", "sync", "cleanup-dupes", "cleanup-empty", "cleanup-orphans", "normalize", "all"],
         default="all",
         help="Выполнить конкретный этап (по умолчанию: all)"
     )
@@ -247,6 +267,9 @@ def main():
 
         if args.step in ["cleanup-empty", "all"]:
             success = cleanup_empty(config, args) and success
+
+        if args.step in ["cleanup-orphans", "all"]:
+            success = cleanup_orphans(config, args) and success
 
         if args.step in ["normalize", "all"]:
             success = normalize_dashes(config, args) and success
