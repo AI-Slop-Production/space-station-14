@@ -32,15 +32,29 @@ class LocaleSync:
         """
         Получает пары файлов (en-US, ru-RU) для синхронизации
 
+        Включает файлы из двух источников:
+        1. Resources/Locale/en-US -> Resources/Locale/ru-RU
+        2. RobustToolbox/Resources/Locale/en-US -> Resources/Locale/ru-RU/robust-toolbox
+
         Returns:
             Список кортежей (en_path, ru_path)
         """
-        en_files = self.config.get_fluent_files(self.config.en_us_locale)
         pairs = []
 
+        # Обычные файлы из Resources/Locale/en-US
+        en_files = self.config.get_fluent_files(self.config.en_us_locale)
         for en_file in en_files:
             ru_file = self.config.get_mirrored_locale_path(en_file)
             pairs.append((en_file, ru_file))
+
+        # Файлы из RobustToolbox (если директория существует)
+        if self.config.robust_toolbox_en_us.exists():
+            rt_files = self.config.get_fluent_files(self.config.robust_toolbox_en_us)
+            for en_file in rt_files:
+                ru_file = self.config.get_mirrored_locale_path(en_file)
+                pairs.append((en_file, ru_file))
+        else:
+            self.logger.debug("RobustToolbox en-US locale не найдена, пропускаем")
 
         return pairs
 

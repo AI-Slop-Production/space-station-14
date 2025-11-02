@@ -28,10 +28,17 @@ class ProjectConfig:
         self.prototypes_dir = self.resources_dir / "Prototypes"
         self.locale_dir = self.resources_dir / "Locale"
 
+        # RobustToolbox (сабмодуль)
+        self.robust_toolbox_dir = self.project_root / "RobustToolbox"
+        self.robust_toolbox_resources = self.robust_toolbox_dir / "Resources"
+        self.robust_toolbox_locale = self.robust_toolbox_resources / "Locale"
+        self.robust_toolbox_en_us = self.robust_toolbox_locale / "en-US"
+
         # Рабочие локали
         self.en_us_locale = self.locale_dir / "en-US"
         self.ru_ru_locale = self.locale_dir / "ru-RU"
         self.ru_ru_ss14_locale = self.ru_ru_locale / "ss14-ru"
+        self.ru_ru_robust_toolbox = self.ru_ru_locale / "robust-toolbox"
 
     def _find_project_root(self) -> Path:
         """
@@ -144,6 +151,10 @@ class ProjectConfig:
         Получает зеркальный путь для файла из en-US в ru-RU.
         Сохраняет точную структуру каталогов.
 
+        Обрабатывает два случая:
+        1. Обычные локали: Resources/Locale/en-US/foo.ftl -> Resources/Locale/ru-RU/foo.ftl
+        2. RobustToolbox: RobustToolbox/Resources/Locale/en-US/foo.ftl -> Resources/Locale/ru-RU/robust-toolbox/foo.ftl
+
         Args:
             en_us_path: Путь к файлу в en-US
             create_dirs: Создавать ли промежуточные директории
@@ -151,11 +162,15 @@ class ProjectConfig:
         Returns:
             Соответствующий путь в ru-RU
         """
-        # Получаем относительный путь от en-US
-        relative = en_us_path.relative_to(self.en_us_locale)
-
-        # Строим зеркальный путь в ru-RU
-        ru_path = self.ru_ru_locale / relative
+        # Проверяем, из RobustToolbox ли этот файл
+        try:
+            relative = en_us_path.relative_to(self.robust_toolbox_en_us)
+            # Это файл из RobustToolbox - помещаем в robust-toolbox/
+            ru_path = self.ru_ru_robust_toolbox / relative
+        except ValueError:
+            # Это обычный файл - получаем относительный путь от en-US
+            relative = en_us_path.relative_to(self.en_us_locale)
+            ru_path = self.ru_ru_locale / relative
 
         if create_dirs:
             ru_path.parent.mkdir(parents=True, exist_ok=True)
@@ -166,6 +181,7 @@ class ProjectConfig:
         """Создает необходимые директории для работы"""
         self.ru_ru_locale.mkdir(parents=True, exist_ok=True)
         self.ru_ru_ss14_locale.mkdir(parents=True, exist_ok=True)
+        self.ru_ru_robust_toolbox.mkdir(parents=True, exist_ok=True)
 
 
 # Глобальный экземпляр конфигурации

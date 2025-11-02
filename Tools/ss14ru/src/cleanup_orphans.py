@@ -152,15 +152,26 @@ class OrphanCleaner:
         """
         Конвертирует путь ru-RU файла в en-US путь
 
+        Обрабатывает два случая:
+        1. Обычные локали: Resources/Locale/ru-RU/foo.ftl -> Resources/Locale/en-US/foo.ftl
+        2. RobustToolbox: Resources/Locale/ru-RU/robust-toolbox/foo.ftl -> RobustToolbox/Resources/Locale/en-US/foo.ftl
+
         Args:
             ru_ru_path: Путь к ru-RU файлу
 
         Returns:
             Путь к en-US файлу
         """
-        path_str = str(ru_ru_path)
-        en_us_str = path_str.replace('/ru-RU/', '/en-US/').replace('\\ru-RU\\', '\\en-US\\')
-        return Path(en_us_str)
+        # Проверяем, из robust-toolbox ли этот файл
+        try:
+            relative = ru_ru_path.relative_to(self.config.ru_ru_robust_toolbox)
+            # Это файл из RobustToolbox - конвертируем в RobustToolbox/Resources/Locale/en-US/
+            return self.config.robust_toolbox_en_us / relative
+        except ValueError:
+            # Это обычный файл - простая замена ru-RU на en-US
+            path_str = str(ru_ru_path)
+            en_us_str = path_str.replace('/ru-RU/', '/en-US/').replace('\\ru-RU\\', '\\en-US\\')
+            return Path(en_us_str)
 
     def is_ss14_ru_generated_file(self, ru_ru_path: Path) -> bool:
         """
