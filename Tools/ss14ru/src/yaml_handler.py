@@ -121,22 +121,13 @@ class YAMLHandler:
             if entity_type != 'entity':
                 continue
 
-            # Проверяем, есть ли хотя бы одно локализуемое поле ИЛИ parent
-            # ВАЖНО: parent тоже считается локализуемым - для цепочки наследования
-            has_localizable = False
-
-            if extract_name and "name" in entity:
-                has_localizable = True
-            if extract_description and "description" in entity:
-                has_localizable = True
-            if extract_suffix and "suffix" in entity:
-                has_localizable = True
-            if "parent" in entity:
-                # Даже если нет собственных полей, но есть parent - нужно создать запись
-                has_localizable = True
-
-            if has_localizable:
-                localizable.append(entity)
+            # ВАЖНО: Добавляем ВСЕ entity независимо от наличия полей
+            # Даже если нет ни name, ни description, ни parent - создаем запись с { "" }
+            # Потому что другие entity могут ссылаться на эту как на parent
+            #
+            # Пример: BaseGameRule (нет полей) <- CargoGiftsBase (ссылается на parent)
+            # Если не создать BaseGameRule, то CargoGiftsBase будет ссылаться на несуществующий ключ
+            localizable.append(entity)
 
         return localizable
 

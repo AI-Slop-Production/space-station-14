@@ -80,9 +80,9 @@ class LocalizableEntity:
 
             try:
                 entity = cls.from_yaml_dict(item)
-                # Добавляем только если есть хотя бы одно локализуемое поле
-                if entity.has_localizable_fields():
-                    entities.append(entity)
+                # ВАЖНО: Добавляем ВСЕ entity (type: entity уже отфильтрован в yaml_handler)
+                # Даже без полей нужно создать запись, т.к. на нее могут ссылаться другие entity
+                entities.append(entity)
             except (ValueError, KeyError):
                 # Пропускаем некорректные сущности
                 continue

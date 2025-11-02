@@ -103,11 +103,12 @@ class FluentSerializer:
         Returns:
             Список FluentMessage (всегда один элемент)
         """
-        # Проверяем, есть ли вообще хоть что-то для локализации
-        # ВАЖНО: parent тоже считается - даже без собственных полей нужно создать ссылки на parent
-        has_any_field = any([entity.name, entity.description, entity.suffix, entity.parent])
-        if not has_any_field:
-            return []
+        # ВАЖНО: Создаем запись ВСЕГДА, даже если нет полей
+        # Даже если нет ни name, ни description, ни suffix, ни parent - создаем с { "" }
+        # Потому что другие entity могут ссылаться на эту как на parent
+        #
+        # Пример: BaseGameRule (нет полей) <- CargoGiftsBase (parent: BaseGameRule)
+        # Без записи BaseGameRule будет ошибка "Unknown message: ent-BaseGameRule"
 
         # Определяем значение name
         if entity.name is not None:
