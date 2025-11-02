@@ -112,10 +112,10 @@ def cleanup_duplicates(config, args):
 
 
 def cleanup_empty(config, args):
-    """Этап 4: Очистка пустых файлов"""
+    """Этап 5: Очистка пустых файлов"""
     logger = logging.getLogger(__name__)
     logger.info("\n" + "=" * 60)
-    logger.info("ЭТАП 4: Очистка пустых файлов и директорий")
+    logger.info("ЭТАП 5: Очистка пустых файлов и директорий")
     logger.info("=" * 60)
 
     cleaner = EmptyCleaner(config)
@@ -133,10 +133,10 @@ def cleanup_empty(config, args):
 
 
 def cleanup_orphans(config, args):
-    """Этап 5: Очистка orphan-ключей"""
+    """Этап 4: Очистка orphan-ключей"""
     logger = logging.getLogger(__name__)
     logger.info("\n" + "=" * 60)
-    logger.info("ЭТАП 5: Очистка orphan-ключей")
+    logger.info("ЭТАП 4: Очистка orphan-ключей")
     logger.info("=" * 60)
 
     cleaner = OrphanCleaner(config)
@@ -145,6 +145,8 @@ def cleanup_orphans(config, args):
     logger.info("\nРезультаты очистки orphan-ключей:")
     logger.info(f"  Обработано файлов: {stats['files_processed']}")
     logger.info(f"  Очищено файлов: {stats['files_cleaned']}")
+    if stats.get('files_deleted', 0) > 0:
+        logger.info(f"  Удалено orphan файлов: {stats['files_deleted']}")
     logger.info(f"  Удалено orphan-ключей: {stats['orphans_removed']}")
     if stats.get('yaml_parse_errors', 0) > 0:
         logger.info(f"  Пропущено YAML файлов с ошибками: {stats['yaml_parse_errors']}")
@@ -160,7 +162,7 @@ def normalize_dashes(config, args):
 
     logger = logging.getLogger(__name__)
     logger.info("\n" + "=" * 60)
-    logger.info("ЭТАП 5: Нормализация тире")
+    logger.info("ЭТАП 6: Нормализация тире")
     logger.info("=" * 60)
 
     normalizer = DashNormalizer(config)
@@ -267,11 +269,11 @@ def main():
         if args.step in ["cleanup-dupes", "all"]:
             success = cleanup_duplicates(config, args) and success
 
-        if args.step in ["cleanup-empty", "all"]:
-            success = cleanup_empty(config, args) and success
-
         if args.step in ["cleanup-orphans", "all"]:
             success = cleanup_orphans(config, args) and success
+
+        if args.step in ["cleanup-empty", "all"]:
+            success = cleanup_empty(config, args) and success
 
         if args.step in ["normalize", "all"]:
             success = normalize_dashes(config, args) and success

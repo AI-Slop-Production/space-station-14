@@ -49,19 +49,53 @@ class OrphanCleaner:
                     if 'id' in entity:
                         entity_ids.add(entity['id'])
             except Exception as e:
-                parse_errors += 1
-                # Относительный путь для более читаемого сообщения
-                rel_path = yaml_file.relative_to(self.config.prototypes_dir)
-
-                # Определяем тип ошибки
+                # Если ошибка связана с табуляцией - попробуем исправить
                 error_msg = str(e)
                 if 'found character' in error_msg and 'cannot start any token' in error_msg:
-                    self.logger.warning(
-                        f"Пропуск {rel_path}: Найдена табуляция вместо пробелов "
-                        f"(YAML не поддерживает табуляцию)"
-                    )
-                else:
-                    self.logger.warning(f"Пропуск {rel_path}: {error_msg}")
+                    try:
+                        # Пробуем прочитать файл и заменить табы на пробелы
+                        with open(yaml_file, 'r', encoding='utf-8') as f:
+                            content = f.read()
+
+                        # Заменяем табуляцию на 2 пробела (стандарт YAML)
+                        fixed_content = content.replace('\t', '  ')
+
+                        # Пробуем распарсить исправленный контент
+                        import yaml
+                        from io import StringIO
+
+                        data = yaml.safe_load(StringIO(fixed_content))
+                        if data is None:
+                            data = []
+                        if not isinstance(data, list):
+                            data = [data]
+
+                        # Извлекаем entity ID из исправленных данных
+                        for item in data:
+                            if isinstance(item, dict) and item.get('type') == 'entity' and 'id' in item:
+                                entity_ids.add(item['id'])
+
+                        parse_errors += 1
+                        rel_path = yaml_file.relative_to(self.config.prototypes_dir)
+                        self.logger.warning(
+                            f"Обработан {rel_path}: Табуляция заменена на пробелы "
+                            f"(извлечено {len([i for i in data if isinstance(i, dict) and i.get('type') == 'entity'])} entity)"
+                        )
+                        continue
+
+                    except Exception as fix_error:
+                        # Не удалось исправить - пропускаем
+                        parse_errors += 1
+                        rel_path = yaml_file.relative_to(self.config.prototypes_dir)
+                        self.logger.warning(
+                            f"Пропуск {rel_path}: Не удалось обработать после замены табуляции: {fix_error}"
+                        )
+                        continue
+
+                # Другие типы ошибок
+                parse_errors += 1
+                rel_path = yaml_file.relative_to(self.config.prototypes_dir)
+                self.logger.warning(f"Пропуск {rel_path}: {error_msg}")
                 continue
 
         return entity_ids, parse_errors
@@ -281,6 +315,7 @@ class OrphanCleaner:
         stats = {
             'files_processed': 0,
             'files_cleaned': 0,
+            'files_deleted': 0,  # Файлы удаленные полностью (нет en-US)
             'orphans_removed': 0,
             'errors': 0
         }
@@ -300,8 +335,16 @@ class OrphanCleaner:
                 en_us_file = self.get_en_us_path_from_ru_ru(ru_ru_file)
 
                 if not en_us_file.exists():
-                    # Если нет en-US файла - пропускаем (или можно удалить весь ru-RU файл)
-                    self.logger.debug(f"Нет en-US файла для {ru_ru_file}")
+                    # Если нет en-US файла - удаляем ru-RU файл полностью
+                    rel_path = ru_ru_file.relative_to(self.config.locale_dir)
+
+                    if dry_run:
+                        self.logger.info(f"[DRY RUN] Будет удален orphan файл (нет en-US): {rel_path}")
+                    else:
+                        ru_ru_file.unlink()
+                        self.logger.info(f"Удален orphan файл (нет en-US): {rel_path}")
+
+                    stats['files_deleted'] += 1
                     continue
 
                 # Получаем валидные ключи из en-US
@@ -348,6 +391,7 @@ class OrphanCleaner:
         total_stats = {
             'files_processed': ss14_stats['files_processed'] + regular_stats['files_processed'],
             'files_cleaned': ss14_stats['files_cleaned'] + regular_stats['files_cleaned'],
+            'files_deleted': regular_stats.get('files_deleted', 0),  # Только regular files могут быть удалены
             'orphans_removed': ss14_stats['orphans_removed'] + regular_stats['orphans_removed'],
             'yaml_parse_errors': ss14_stats.get('yaml_parse_errors', 0),
             'errors': ss14_stats['errors'] + regular_stats['errors']
