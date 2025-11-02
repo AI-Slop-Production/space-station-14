@@ -91,15 +91,23 @@ class LocalizableEntity:
 
     def has_localizable_fields(self) -> bool:
         """
-        Проверяет, есть ли у сущности локализуемые поля
+        Проверяет, есть ли у сущности локализуемые поля или parent
+
+        ВАЖНО: Даже если у сущности нет собственных полей, но есть parent,
+        мы должны создать запись со ссылками на parent. Иначе ломается цепочка наследования.
+
+        Например:
+        - WallBrick (name) -> BaseWall (только parent) -> BaseStructureWall (name, desc)
+        - Если не создать BaseWall, то WallBrick.desc будет ссылаться на несуществующий BaseWall.desc
 
         Returns:
-            True если есть хотя бы одно локализуемое поле
+            True если есть хотя бы одно локализуемое поле ИЛИ parent
         """
         return any([
             self.name is not None and self.name != '',
             self.description is not None and self.description != '',
-            self.suffix is not None and self.suffix != ''
+            self.suffix is not None and self.suffix != '',
+            self.parent is not None  # ВАЖНО: parent тоже считается локализуемым полем
         ])
 
     def get_fluent_key_prefix(self) -> str:

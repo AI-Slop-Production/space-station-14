@@ -121,7 +121,8 @@ class YAMLHandler:
             if entity_type != 'entity':
                 continue
 
-            # Проверяем, есть ли хотя бы одно локализуемое поле
+            # Проверяем, есть ли хотя бы одно локализуемое поле ИЛИ parent
+            # ВАЖНО: parent тоже считается локализуемым - для цепочки наследования
             has_localizable = False
 
             if extract_name and "name" in entity:
@@ -129,6 +130,9 @@ class YAMLHandler:
             if extract_description and "description" in entity:
                 has_localizable = True
             if extract_suffix and "suffix" in entity:
+                has_localizable = True
+            if "parent" in entity:
+                # Даже если нет собственных полей, но есть parent - нужно создать запись
                 has_localizable = True
 
             if has_localizable:

@@ -104,7 +104,8 @@ class FluentSerializer:
             Список FluentMessage (всегда один элемент)
         """
         # Проверяем, есть ли вообще хоть что-то для локализации
-        has_any_field = any([entity.name, entity.description, entity.suffix])
+        # ВАЖНО: parent тоже считается - даже без собственных полей нужно создать ссылки на parent
+        has_any_field = any([entity.name, entity.description, entity.suffix, entity.parent])
         if not has_any_field:
             return []
 
