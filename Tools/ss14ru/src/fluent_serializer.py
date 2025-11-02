@@ -49,18 +49,19 @@ class FluentSerializer:
 
         ВАЖНО: Fluent не поддерживает списки в ссылках { [A, B] }.
         Для списка родителей используем последнего (наиболее специфичный).
+        Добавляем префикс "ent-" к parent ID, так как в Fluent файлах все entity имеют этот префикс.
 
         Args:
             parent: ID родителя (строка или список строк)
 
         Returns:
-            Форматированная ссылка (например, "{ ParentId }")
+            Форматированная ссылка (например, "{ ent-ParentId }")
         """
         if isinstance(parent, str):
-            return f"{{ {parent} }}"
+            return f"{{ ent-{parent} }}"
         elif isinstance(parent, list) and parent:
             # Берём последнего родителя из списка (наиболее специфичный)
-            return f"{{ {parent[-1]} }}"
+            return f"{{ ent-{parent[-1]} }}"
         return "{ \"\" }"
 
     def _format_parent_attribute_reference(self, parent: Union[str, List[str]], attribute: str) -> str:
@@ -69,19 +70,20 @@ class FluentSerializer:
 
         ВАЖНО: Fluent не поддерживает списки в ссылках { [A.desc, B.desc] }.
         Для списка родителей используем последнего (наиболее специфичный).
+        Добавляем префикс "ent-" к parent ID, так как в Fluent файлах все entity имеют этот префикс.
 
         Args:
             parent: ID родителя (строка или список строк)
             attribute: Имя атрибута (например, "desc")
 
         Returns:
-            Форматированная ссылка (например, "{ ParentId.desc }")
+            Форматированная ссылка (например, "{ ent-ParentId.desc }")
         """
         if isinstance(parent, str):
-            return f"{{ {parent}.{attribute} }}"
+            return f"{{ ent-{parent}.{attribute} }}"
         elif isinstance(parent, list) and parent:
             # Берём последнего родителя из списка (наиболее специфичный)
-            return f"{{ {parent[-1]}.{attribute} }}"
+            return f"{{ ent-{parent[-1]}.{attribute} }}"
         return "{ \"\" }"
 
     def entity_to_messages(
